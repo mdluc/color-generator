@@ -1,6 +1,6 @@
 {
-  "homepage": "https://mdluc.github.io/generate-color",
-  "name": "generate-color",
+  "homepage": "https://mdluc.github.io/color-generator",
+  "name": "color-generator",
   "version": "0.1.0",
   "private": true,
   "dependencies": {

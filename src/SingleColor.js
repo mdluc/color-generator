@@ -1,31 +1,32 @@
-import React, { useState, useEffect } from 'react'
-import rgbToHex from './utils'
+import React, { useState, useEffect } from "react";
+const SingleColor = ({ rgb, weight, index, hex, gradation, type }) => {
+  const [alert, setAlert] = useState(false);
+  const bcg = rgb.join(",");
+  const hexValue = `#${hex}`;
 
-const SingleColor = ({ rgb, weight, index, hexColor }) => {
-  const [alert, setAlert] = useState(false)
-  const bcg = rgb.join(',')
-  const hex = rgbToHex(...rgb)
-  const hexValue = `#${hexColor}`
+  const handleClick = () => {
+    setAlert(true);
+    navigator.clipboard.writeText(hexValue);
+  };
+
   useEffect(() => {
     const timeout = setTimeout(() => {
-      setAlert(false)
-    }, 3000)
-    return () => clearTimeout(timeout)
-  }, [alert])
+      setAlert(false);
+    }, 1000);
+    return () => clearTimeout(timeout);
+  }, [alert]);
+
   return (
     <article
-      className={`color ${index > 10 && 'color-light'}`}
+      className={`color ${(type==="shade" || type==="base")?"color-light":"color-black"}`}
       style={{ backgroundColor: `rgb(${bcg})` }}
-      onClick={() => {
-        setAlert(true)
-        navigator.clipboard.writeText(hexValue)
-      }}
+      onClick={handleClick}
     >
-      <p className='percent-value'>{weight}%</p>
-      <p className='color-value'>{hexValue}</p>
-      {alert && <p className='alert'>copied to clipboard</p>}
+      <p className="percent-value">{weight}%</p>
+      <p className="color-value">{hexValue}</p>
+      {alert && <p className={`alert ${(type==="shade" || type==="base")?"color-light":"color-black"}`}>copied to clipboard</p>}
     </article>
-  )
-}
+  );
+};
 
-export default SingleColor
+export default SingleColor;

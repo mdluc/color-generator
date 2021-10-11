@@ -1,57 +1,109 @@
-import React, { useState } from 'react'
-import SingleColor from './SingleColor'
-import 'bootstrap/dist/css/bootstrap.min.css';
-import Values from 'values.js'
-import Button from "react-bootstrap/Button"
-import Modal from "react-bootstrap/Modal"
+import React, { useState } from "react";
+import SingleColor from "./SingleColor";
+import "bootstrap/dist/css/bootstrap.min.css";
+import Values from 'values.js';
+import Button from "react-bootstrap/Button";
+import Modal from "react-bootstrap/Modal";
+import Form from "react-bootstrap/Form";
+import Container from "react-bootstrap/Container";
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col"
+import {AiFillCloseCircle} from "react-icons/ai"
 
 function App() {
-  const [color, setColor] = useState("");
+  const [color, setColor] = useState("#41609b"); //default color
+  const [show, setShow] = useState(false); //state used for showing the error modal
+  const [gradation, setGradation] = useState(""); //state used for setting the level of gradation for each type tint/shade
+  const [list, setList] = useState(new Values("#41609b").all(gradation)); //state used for listing all the colors using the values.js library
   const [error, setError] = useState(false);
-  const [list, setList] = useState(new Values('#40e0d0').all(10));
-  const [show, setShow] = useState(false);
-
+  
   const handleClose = () => setShow(false);
-  const handleSubmit = (e) =>{
-    e.preventDefault();
-    try{
-      let colors = new Values(color).all(10);
-      setList(colors);
-    }
-    catch(error){
-      setError(true);
-      setShow(true);
-    }
-  }
 
+  const handleChangeColor = (event) => {
+    setColor(event.target.value);
+  };
+
+  const handleChangeGradation = (event) => {
+    const value = event.target.value;
+    if (value === "0") {
+      setShow(true);
+    } else {
+      setGradation(parseInt(value));
+    }
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    try {
+      if (
+        isNaN(gradation) ||
+        gradation < 1 ||
+        gradation > 100 ||
+        gradation.toString() === ""
+      ) {
+        setShow(true);
+      } else {
+        let colors = new Values(color).all(gradation);
+        setList(colors);
+      }
+    } catch(error){
+      setError(true)
+    }
+  };
 
   return (
-  <>
-  <section className="container">
-    <h3>color generator project</h3>
-    <form onSubmit={handleSubmit}>
-    <input
-            type="text"
+    <>
+      <Container fluid>
+        <Row>
+        <h3>color generator project</h3>
+
+        <Form className="forms" onSubmit={handleSubmit}>
+          <Form.Group>
+            <Form.Label>Enter the level of gradation you want:</Form.Label>
+
+            <Form.Control
+              type="number"
+              value={gradation}
+              onChange={handleChangeGradation}
+              placeholder="ex: 10"
+            />
+          </Form.Group>
+          <Form.Control
+            type="color"
             value={color}
-            onChange={(e) => setColor(e.target.value)}
-            placeholder="#40e0d0"
+            onChange={handleChangeColor}
           />
-      <Button  type="submit" className="btn btn-style">Submit</Button>
-        <Modal show={show} onHide={handleClose} size="md">
-          <Modal.Header closeButton>
-            <Modal.Title>
-              ERROR: Unable to parse color
-            </Modal.Title>
-          </Modal.Header>
-        </Modal>
-    </form>
-  </section>
-  <section className="colors">
-    {list.map((color, index)=>{
-      return <SingleColor key={index} {...color} index={index} hexColor={color.hex}/>;
-    })}
-    
-    </section></>);
+
+          <Button type="submit" id="btn-styling">
+            GENERATE
+          </Button>
+          <Modal
+            show={show}
+            onHide={handleClose}
+            size="md"
+            className="modal-styling"
+          >
+            <Modal.Header closeButton>
+              <AiFillCloseCircle style={{margin:"10px",fontSize:"25px"}}/>
+              <Modal.Title>ERROR!</Modal.Title>{" "}
+            </Modal.Header>
+            <Modal.Body>
+              Out of range value. Please add a value between [1 - 100]
+            </Modal.Body>
+          </Modal>
+        </Form>
+        </Row>
+     
+      <Row>
+        {list.map((color, index) => {
+          return (
+            <Col md={3}  id="colors"><SingleColor key={index} {...color} index={index} hex={color.hex} /></Col>
+          );
+        })}
+      </Row>
+    </Container>
+    </>
+  );
 }
 
-export default App
+export default App;
